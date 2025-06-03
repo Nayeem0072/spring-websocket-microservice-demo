@@ -45,10 +45,14 @@ services:
       - SPRING_CASSANDRA_SCHEMA_ACTION=CREATE_IF_NOT_EXISTS
       - SPRING_CASSANDRA_KEYSPACE_NAME=test_keyspace
     depends_on:
-      - eureka-server
-      - backend
-      - kafka
-      - cassandra
+      eureka-server:
+        condition: service_started
+      backend:
+        condition: service_started
+      kafka:
+        condition: service_started
+      cassandra-init:
+        condition: service_completed_successfully
     networks:
       - demo-network
 
@@ -119,8 +123,8 @@ services:
     command: >
       bash -c "
         echo 'Waiting for Cassandra to be ready...' &&
-        for i in {1..30}; do
-          echo 'Attempt $i: Trying to connect to Cassandra...'
+        for ((i=1; i<=30; i++)); do
+          echo \"Attempt $$i: Trying to connect to Cassandra...\"
           if cqlsh cassandra -e 'SELECT now() FROM system.local;' > /dev/null 2>&1; then
             echo 'Successfully connected to Cassandra!'
             echo 'Creating keyspace...'
@@ -129,7 +133,7 @@ services:
             cqlsh cassandra -e 'DESCRIBE KEYSPACES;'
             exit 0
           fi
-          echo 'Waiting for Cassandra... attempt $i'
+          echo \"Waiting for Cassandra... attempt $$i\"
           sleep 10
         done
         echo 'Failed to connect to Cassandra after 30 attempts'
