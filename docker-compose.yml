@@ -110,6 +110,34 @@ services:
     networks:
       - demo-network
 
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+      - cassandra
+    volumes:
+      - ./cassandra-init:/docker-entrypoint-initdb.d
+    command: >
+      bash -c "
+        echo 'Waiting for Cassandra to be ready...' &&
+        for i in {1..30}; do
+          echo 'Attempt $i: Trying to connect to Cassandra...'
+          if cqlsh cassandra -e 'SELECT now() FROM system.local;' > /dev/null 2>&1; then
+            echo 'Successfully connected to Cassandra!'
+            echo 'Creating keyspace...'
+            cqlsh cassandra -e \"CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};\"
+            echo 'Verifying keyspace creation...'
+            cqlsh cassandra -e 'DESCRIBE KEYSPACES;'
+            exit 0
+          fi
+          echo 'Waiting for Cassandra... attempt $i'
+          sleep 10
+        done
+        echo 'Failed to connect to Cassandra after 30 attempts'
+        exit 1
+      "
+    networks:
+      - demo-network
+
 networks:
   demo-network:
     # Remove the next line
