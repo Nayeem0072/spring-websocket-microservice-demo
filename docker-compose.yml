@@ -39,12 +39,16 @@ services:
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
       - KAFKA_SERVERS=kafka:29092
-      - MONGODB_URI=mongodb://mongodb:27017/chatdb
+      - SPRING_CASSANDRA_CONTACT_POINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_CASSANDRA_LOCAL_DATACENTER=datacenter1
+      - SPRING_CASSANDRA_SCHEMA_ACTION=CREATE_IF_NOT_EXISTS
+      - SPRING_CASSANDRA_KEYSPACE_NAME=test_keyspace
     depends_on:
       - eureka-server
       - backend
       - kafka
-      - mongodb
+      - cassandra
     networks:
       - demo-network
 
@@ -92,13 +96,17 @@ services:
     networks:
       - demo-network
 
-  mongodb:
-    container_name: mongodb
-    image: mongo:latest
+  cassandra:
+    container_name: cassandra
+    image: cassandra:latest
     ports:
-      - "27017:27017"
+      - "9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: Test Cluster
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_RACK: rack1
     volumes:
-      - mongodb_data:/data/db
+      - cassandra_data:/var/lib/cassandra
     networks:
       - demo-network
 
@@ -108,4 +116,4 @@ networks:
     # external: true
 
 volumes:
-  mongodb_data:
+  cassandra_data:
