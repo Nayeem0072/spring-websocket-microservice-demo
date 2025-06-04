@@ -1,6 +1,6 @@
 # Microservices Chat Application
 
-A distributed chat application built with Spring Boot microservices, React, Apache Kafka, and MongoDB.
+A distributed chat application built with Spring Boot microservices, React, Apache Kafka, and Apache Cassandra.
 
 ## Architecture
 
@@ -24,7 +24,7 @@ The application consists of the following microservices:
   - Spring Cloud Gateway
   - Spring WebSocket
   - Apache Kafka
-  - MongoDB
+  - Apache Cassandra
   - Maven
   - Docker
 
@@ -91,7 +91,7 @@ For local development, you can run services individually:
 ## Features
 
 - Real-time chat using WebSocket
-- Message persistence in MongoDB
+- Message persistence in Cassandra
 - Service discovery and registration
 - Load balancing through API Gateway
 - Event-driven architecture using Kafka
