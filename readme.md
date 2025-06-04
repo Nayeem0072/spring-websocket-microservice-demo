@@ -47,7 +47,7 @@ The application consists of the following microservices:
 2. Start all services using Docker Compose:
 
 ```bash
-docker-compose up -d
+docker-compose up --build -d
 ```
 
 3. Start the React client:
